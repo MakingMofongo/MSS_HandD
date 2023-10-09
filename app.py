@@ -116,7 +116,7 @@ def main():
         
 
         # Divide the input image into nxn grid
-        n = 1
+        n = 4
         height, width, _ = image.shape
         quads = []
         for i in range(n):
