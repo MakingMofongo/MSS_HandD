@@ -108,15 +108,15 @@ def main():
         number, mode = select_mode(key, mode)
 
         # Camera capture #####################################################
-        ret, image = cap.read()
-        if not ret:
-            break
-        # image = cv.imread('images/1.jpg')
+        # ret, image = cap.read()
+        # if not ret:
+            # break
+        image = cv.imread('images/1.jpg')
         image = cv.flip(image, 1)  # Mirror display
         
 
         # Divide the input image into nxn grid
-        n = 4
+        n = 6
         height, width, _ = image.shape
         quads = []
         for i in range(n):
@@ -124,6 +124,7 @@ def main():
                 quads.append(image[int(i*height/n):int((i+1)*height/n), int(j*width/n):int((j+1)*width/n)])
 
         # test display
+        print("displaying test image")
         cv.imshow('test', quads[0])
         cv.waitKey(0)
 
