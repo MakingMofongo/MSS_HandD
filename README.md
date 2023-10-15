@@ -1,6 +1,6 @@
 # hand-gesture-recognition-using-mediapipe
 
-
+Forked from https://github.com/Kazuhito00/hand-gesture-recognition-using-mediapipe
 
 # Requirements
 * mediapipe 0.8.1
