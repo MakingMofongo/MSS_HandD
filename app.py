@@ -15,6 +15,8 @@ from utils import CvFpsCalc
 from model import KeyPointClassifier
 from model import PointHistoryClassifier
 
+import pandas as pd
+
 
 def get_args():
     parser = argparse.ArgumentParser()
@@ -57,6 +59,10 @@ def main():
     cap.set(cv.CAP_PROP_FRAME_WIDTH, cap_width)
     cap.set(cv.CAP_PROP_FRAME_HEIGHT, cap_height)
 
+    # Dataframe preparation #############################################################
+    df = pd.DataFrame(columns = [ 'grid' , 'Hand Open' , 'Hand Closed'])
+
+
     # Model load #############################################################
     mp_hands = mp.solutions.hands
     hands = mp_hands.Hands(
@@ -97,7 +103,7 @@ def main():
 
     #  ########################################################################
     mode = 0
-
+    x = True
     while True:
         fps = cvFpsCalc.get()
 
@@ -116,21 +122,23 @@ def main():
         
 
         # Divide the input image into nxn grid
-        n = 6
+        n = 8
         height, width, _ = image.shape
         quads = []
+        segment_nos = []
         for i in range(n):
             for j in range(n):
                 quads.append(image[int(i*height/n):int((i+1)*height/n), int(j*width/n):int((j+1)*width/n)])
+                segment_nos.append([i,j])
+
 
         # test display
-        print("displaying test image")
-        cv.imshow('test', quads[0])
-        cv.waitKey(0)
-
+        #print("displaying test image")
+        #cv.imshow('test', quads[0])
+        #cv.waitKey(0)
         output_images = []
         i=0
-        for quad in quads:
+        for quad,segment_no in zip(quads, segment_nos):
             # print(f"Processing quadrant {i}")
             debug_image = copy.deepcopy(quad)
             # cv.imshow(f"debug image {i}", debug_image)
@@ -191,13 +199,30 @@ def main():
                         keypoint_classifier_labels[hand_sign_id],
                         point_history_classifier_labels[most_common_fg_id[0][0]],
                     )
+
+                    # Adding Rows to Dataframe
+                    if x:
+                        handgest = keypoint_classifier_labels[hand_sign_id]
+                        if handgest == "Close":
+                            new_row = {'grid' : segment_no , 'Hand Open': 0  ,'Hand Closed': 1}
+                        
+                        elif handgest == "Open":
+                            new_row = {'grid' : segment_no , 'Hand Open': 1  ,'Hand Closed': 0}
+
+                        else:
+                            new_row = {'grid' : segment_no , 'Hand Open': 0  ,'Hand Closed': 0}
+
+                        df = df.append(new_row,ignore_index=True)
+                     
+                    
             else:
                 point_history.append([0, 0])
 
             debug_image = draw_point_history(debug_image, point_history)
             # debug_image = draw_info(debug_image, fps, mode, number)
-            cv.imshow(f"Processed quad {i}", debug_image)
+            #cv.imshow(f"Processed quad {i}", debug_image)
             output_images.append(debug_image)
+        
         
         # Stitch the images back together
         output = np.zeros((height, width, 3), dtype=np.uint8)
@@ -212,6 +237,12 @@ def main():
             cv.line(output, (int(i*width/n), 0), (int(i*width/n), height), (0, 0, 0), 1)
         
         cv.imshow('Hand Gesture Recognition', output)
+
+
+        if x:
+            print(df)
+       
+        x = False
 
     cap.release()
     cv.destroyAllWindows()
