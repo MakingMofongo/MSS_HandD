@@ -16,6 +16,8 @@ from model import KeyPointClassifier
 from model import PointHistoryClassifier
 
 import pandas as pd
+import sys
+
 
 
 def get_args():
@@ -117,12 +119,12 @@ def main():
         # ret, image = cap.read()
         # if not ret:
             # break
-        image = cv.imread('images/1.jpg')
-        image = cv.flip(image, 1)  # Mirror display
+        image = cv.imread('captured_image.png')
+        #image = cv.flip(image, 1)  # Mirror display
         
 
         # Divide the input image into nxn grid
-        n = 8
+        n = 2
         height, width, _ = image.shape
         quads = []
         segment_nos = []
@@ -236,13 +238,16 @@ def main():
             cv.line(output, (0, int(i*height/n)), (width, int(i*height/n)), (0, 0, 0), 1)
             cv.line(output, (int(i*width/n), 0), (int(i*width/n), height), (0, 0, 0), 1)
         
-        cv.imshow('Hand Gesture Recognition', output)
+        #cv.imshow('Hand Gesture Recognition', output)
+        cv.imwrite('processed_image.jpg', output)
 
 
         if x:
             print(df)
+            df.to_csv('output.csv', index=False) 
        
         x = False
+        sys.exit(1)
 
     cap.release()
     cv.destroyAllWindows()
