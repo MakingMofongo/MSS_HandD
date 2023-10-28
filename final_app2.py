@@ -782,7 +782,7 @@ def find_overlapping_coords(rect_coords1 ,rect_coords2):
 
             
             # Check for intersection in the overlapped image
-            if  not are_rectangles_non_intersecting(rectangle1, rectangle2):
+            if not are_rectangles_non_intersecting(rectangle1, rectangle2):
                 continue
             else:
                 remove_coords.append(coords2)
@@ -790,30 +790,33 @@ def find_overlapping_coords(rect_coords1 ,rect_coords2):
     result = [x for x in rect_coords2 if x not in remove_coords]
     return result
 
-
+n = [1,2,3,4,5,6,7,8]
 #Getting all the coords ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-hand_coords4 = main1(4)
-hand_coords6 = main1(6)
-hand_coords8 = main1(8)
+hand_coords = []
+for x in n:
+    hand_coords.append(main1(x))
 
+#getting valid coords for each griddd +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-#finding overlapping hands of 6x6++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+for i in range(1,len(hand_coords)):
+    for j in range(i):
+        hand_coords[i] = find_overlapping_coords(hand_coords[j], hand_coords[i])
 
-hand_coords6 = find_overlapping_coords(hand_coords4, hand_coords6)
-
-
-#finding overlapping hands of 8x8++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-print(hand_coords4)
-print(hand_coords8)
-hand_coords8 = find_overlapping_coords(hand_coords4, hand_coords8)
-print(hand_coords8)
-hand_coords8 = find_overlapping_coords(hand_coords6, hand_coords8)
 
 
 #getting the correct hands at each level++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-main2(hand_coords4, 4 , "processed4.jpg", "captured_image.png")
-main2(hand_coords6, 6 , "processed6.jpg", "processed4.jpg")
-main2(hand_coords8, 8 , "processed_image.jpg", "processed6.jpg")
+
+
+for i in range(len(hand_coords)):
+    if i==0 and i!= len(hand_coords)-1:
+        main2(hand_coords[i], n[i] , f"processed{i}.jpg", "captured_image.png")
+    elif i != len(hand_coords)-1:
+        main2(hand_coords[i], n[i] , f"processed{i}.jpg", f"processed{i-1}.jpg")
+
+    else:
+        main2(hand_coords[i], n[i] , "processed_image.jpg", f"processed{i-1}.jpg")
+
+
 
 
 # Overlapping +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
