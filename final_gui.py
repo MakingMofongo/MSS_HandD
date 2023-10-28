@@ -2,11 +2,15 @@ import os
 import sys
 import cv2
 import numpy as np
-from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QLabel
+from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QLabel, QLineEdit
 from PyQt5.QtCore import QTimer
 from PyQt5.QtGui import QImage, QPixmap
 import subprocess
+import pandas as pd
 
+hands_open = "hands open"
+hands_close = "hands close"
+filename = "output.csv"
 class WebcamCaptureApp(QWidget):
     def __init__(self):
         super().__init__()
@@ -16,23 +20,34 @@ class WebcamCaptureApp(QWidget):
 
         self.layout = QVBoxLayout()
 
+       
+        # Add input text boxes
+        self.handsopen_input = QLineEdit(self)
+        self.handsopen_input.setPlaceholderText("Enter for Hands Open")
+        self.layout.addWidget(self.handsopen_input)
+
+        self.handsclose_input = QLineEdit(self)
+        self.handsclose_input.setPlaceholderText("Enter for Hands Close")
+        self.layout.addWidget(self.handsclose_input)
+
+        self.filename_input = QLineEdit(self)
+        self.filename_input.setPlaceholderText("File name")
+        self.layout.addWidget(self.filename_input)
+
+        # Add a button to trigger the disappearance of input boxes
+        self.input_button = QPushButton("Submit Input")
+        self.input_button.clicked.connect(self.hide_input)
+        self.layout.addWidget(self.input_button)
+
         self.image_label = QLabel(self)
         self.layout.addWidget(self.image_label)
-
-
 
         self.captured_image_label = QLabel(self)
         self.layout.addWidget(self.captured_image_label)
         self.screenshot_taken = False
 
-
-
-
         self.graph_label = QLabel(self)
         self.layout.addWidget(self.graph_label)
-
-      
-
 
         self.start_button = QPushButton("Start")
         self.capture_button = QPushButton("Capture")
@@ -54,6 +69,26 @@ class WebcamCaptureApp(QWidget):
         self.video_capture = None
 
         self.setLayout(self.layout)
+
+        # Initialize a variable to track whether the input has been submitted
+        self.input_submitted = False
+
+    def hide_input(self):
+
+        global hands_open
+        global hands_close
+        global filename
+        # Get input values and hide the input boxes
+        hands_open = self.handsopen_input.text()
+        hands_close = self.handsclose_input.text()
+        filename = self.filename_input.text()
+
+
+        self.handsopen_input.hide()
+        self.handsclose_input.hide()
+        self.filename_input.hide()
+        self.input_button.hide()
+        self.input_submitted = True
 
     def start_webcam(self):
         if not self.is_capturing:
@@ -91,6 +126,12 @@ class WebcamCaptureApp(QWidget):
                 cv2.imwrite("captured_image.png", frame)
                 subprocess.call(['python', 'final_app2.py'])
                 subprocess.call(['python', 'graph.py'])
+
+                df = pd.read_csv("output.csv")
+
+                df = df.rename(columns= {'Hand Open': hands_open , 'Hand Closed': hands_close})
+
+                df.to_csv(filename, index=False)
 
                 self.show_combined_images("processed_image.jpg", "bar_graph.png")  # Display side by side
                 self.stop_webcam()

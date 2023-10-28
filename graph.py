@@ -10,7 +10,7 @@ total_hands_close = df['Hand Closed'].sum()
 # print(total_hands_close)
 # print(total_hands_open)
 
-categories = ['Yes', 'No']
+categories = ['Hands Open', 'Hands closed']
 counts = [total_hands_open, total_hands_close]
 
 
