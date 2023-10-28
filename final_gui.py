@@ -89,7 +89,7 @@ class WebcamCaptureApp(QWidget):
             ret, frame = self.video_capture.read()
             if ret:
                 cv2.imwrite("captured_image.png", frame)
-                subprocess.call(['python', 'app.py'])
+                subprocess.call(['python', 'final_app2.py'])
                 subprocess.call(['python', 'graph.py'])
 
                 self.show_combined_images("processed_image.jpg", "bar_graph.png")  # Display side by side
