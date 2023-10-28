@@ -792,9 +792,9 @@ def find_overlapping_coords(rect_coords1 ,rect_coords2):
 
 
 #Getting all the coords ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-hand_coords4 = main1(4)
-hand_coords6 = main1(6)
-hand_coords8 = main1(8)
+hand_coords4 = main1(1)
+hand_coords6 = main1(4)
+hand_coords8 = main1(6)
 
 
 #finding overlapping hands of 6x6++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -811,9 +811,9 @@ hand_coords8 = find_overlapping_coords(hand_coords6, hand_coords8)
 
 
 #getting the correct hands at each level++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-main2(hand_coords4, 4 , "processed4.jpg", "captured_image.png")
-main2(hand_coords6, 6 , "processed6.jpg", "processed4.jpg")
-main2(hand_coords8, 8 , "processed_image.jpg", "processed6.jpg")
+main2(hand_coords4, 1 , "processed4.jpg", "captured_image.png")
+main2(hand_coords6, 4 , "processed6.jpg", "processed4.jpg")
+main2(hand_coords8, 6 , "processed_image.jpg", "processed6.jpg")
 
 
 # Overlapping +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
