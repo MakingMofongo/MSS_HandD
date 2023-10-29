@@ -44,38 +44,9 @@ def get_args():
 
 
 def main1(n):
-    # Argument parsing #################################################################
-    args = get_args()
 
-    cap_device = args.device
-    cap_width = args.width
-    cap_height = args.height
-
-    use_static_image_mode = args.use_static_image_mode
-    min_detection_confidence = args.min_detection_confidence
-    min_tracking_confidence = args.min_tracking_confidence
-
-    use_brect = True
-
-    # Camera preparation ###############################################################
-    cap = cv.VideoCapture(cap_device)
-    cap.set(cv.CAP_PROP_FRAME_WIDTH, cap_width)
-    cap.set(cv.CAP_PROP_FRAME_HEIGHT, cap_height)
-
- 
-    # Model load #############################################################
-    mp_hands = mp.solutions.hands
-    hands = mp_hands.Hands(
-        static_image_mode=use_static_image_mode,
-        max_num_hands=15,
-        min_detection_confidence=min_detection_confidence,
-        min_tracking_confidence=min_tracking_confidence,
-    )
-
-    keypoint_classifier = KeyPointClassifier()
-
-    point_history_classifier = PointHistoryClassifier()
-
+    global hands
+    
     # Read labels ###########################################################
     with open('model/keypoint_classifier/keypoint_classifier_label.csv',
               encoding='utf-8-sig') as f:
@@ -91,112 +62,66 @@ def main1(n):
             row[0] for row in point_history_classifier_labels
         ]
 
-    # FPS Measurement ########################################################
-    cvFpsCalc = CvFpsCalc(buffer_len=10)
 
     # Coordinate history #################################################################
     history_length = 16
     point_history = deque(maxlen=history_length)
-
-    # Finger gesture history ################################################
-    finger_gesture_history = deque(maxlen=history_length)
-
-    #  ########################################################################
-    mode = 0
-    while True:
-        fps = cvFpsCalc.get()
-
-        # Process Key (ESC: end) #################################################
-        key = cv.waitKey(10)
-        if key == 27:  # ESC
-            break
-        number, mode = select_mode(key, mode)
-
-        
-        image = cv.imread("captured_image.png")
-        #image = cv.flip(image, 1)  # Mirror display
-        
-
-        # Divide the input image into nxn grid
-        height, width, _ = image.shape
-        quads = []
-        segment_nos = []
-        for i in range(n):
-            for j in range(n):
-                quads.append(image[int(i*height/n):int((i+1)*height/n), int(j*width/n):int((j+1)*width/n)])
-                segment_nos.append([i,j])
-
-        i=0
-
-        hand_coords = []
-        for quad,segment_no in zip(quads, segment_nos):
-            # print(f"Processing quadrant {i}")
-            debug_image = copy.deepcopy(quad)
-            # cv.imshow(f"debug image {i}", debug_image)
-            i+=1
-            # Detection implementation (for each quadrant)
-            quad = cv.cvtColor(quad, cv.COLOR_BGR2RGB)
-            quad.flags.writeable = False
-
-            results = hands.process(quad)
-
-            quad.flags.writeable = True
-
-
-            #  ####################################################################
-            if results.multi_hand_landmarks is not None:
-                for hand_landmarks, handedness in zip(results.multi_hand_landmarks,
-                                                    results.multi_handedness):
-                    # Bounding box calculation
-                    brect = calc_bounding_rect(debug_image, hand_landmarks)
-                    w1 = brect[0]
-                    h1 = brect[1]
-                    w2 = brect[2]
-                    h2 = brect[3]
-                    translated_brect = [w1 + segment_no[1]*(width//n) , h1 + segment_no[0]*(height//n), w2 + segment_no[1]*(width//n)  , h2 + segment_no[0]*(height//n)]
-
-                    hand_coords.append(translated_brect)
-                          
-            else:
-                point_history.append([0, 0])
     
-        return hand_coords
+    image = cv.imread("images/1.jpg")
+    #image = cv.flip(image, 1)  # Mirror display
+    
 
-    cap.release()
-    cv.destroyAllWindows()
+    # Divide the input image into nxn grid
+    height, width, _ = image.shape
+    quads = []
+    segment_nos = []
+    for i in range(n):
+        for j in range(n):
+            quads.append(image[int(i*height/n):int((i+1)*height/n), int(j*width/n):int((j+1)*width/n)])
+            segment_nos.append([i,j])
+
+    i=0
+
+    hand_coords = []
+    for quad,segment_no in zip(quads, segment_nos):
+        # print(f"Processing quadrant {i}")
+        debug_image = copy.deepcopy(quad)
+        # cv.imshow(f"debug image {i}", debug_image)
+        i+=1
+        # Detection implementation (for each quadrant)
+        quad = cv.cvtColor(quad, cv.COLOR_BGR2RGB)
+        quad.flags.writeable = False
+
+        results = hands.process(quad)
+
+        quad.flags.writeable = True
+
+        if results.multi_hand_landmarks is not None:
+            for hand_landmarks, handedness in zip(results.multi_hand_landmarks,
+                                                results.multi_handedness):
+                # Bounding box calculation
+                brect = calc_bounding_rect(debug_image, hand_landmarks)
+                w1 = brect[0]
+                h1 = brect[1]
+                w2 = brect[2]
+                h2 = brect[3]
+                translated_brect = [w1 + segment_no[1]*(width//n) , h1 + segment_no[0]*(height//n), w2 + segment_no[1]*(width//n)  , h2 + segment_no[0]*(height//n)]
+
+                hand_coords.append(translated_brect)
+                        
+        else:
+            point_history.append([0, 0])
+
+    return hand_coords
+
 
 
 def main2(coords, n , img_name , orig_img):
 
     global df 
-    # Argument parsing #################################################################
-    args = get_args()
-
-    cap_device = args.device
-    cap_width = args.width
-    cap_height = args.height
-
-    use_static_image_mode = args.use_static_image_mode
-    min_detection_confidence = args.min_detection_confidence
-    min_tracking_confidence = args.min_tracking_confidence
-
+    global hands
+ 
     use_brect = True
-
-    # Camera preparation ###############################################################
-    cap = cv.VideoCapture(cap_device)
-    cap.set(cv.CAP_PROP_FRAME_WIDTH, cap_width)
-    cap.set(cv.CAP_PROP_FRAME_HEIGHT, cap_height)
-
-    
-
-    # Model load #############################################################
-    mp_hands = mp.solutions.hands
-    hands = mp_hands.Hands(
-        static_image_mode=use_static_image_mode,
-        max_num_hands=15,
-        min_detection_confidence=min_detection_confidence,
-        min_tracking_confidence=min_tracking_confidence,
-    )
 
     keypoint_classifier = KeyPointClassifier()
 
@@ -217,8 +142,7 @@ def main2(coords, n , img_name , orig_img):
             row[0] for row in point_history_classifier_labels
         ]
 
-    # FPS Measurement ########################################################
-    cvFpsCalc = CvFpsCalc(buffer_len=10)
+ 
 
     # Coordinate history #################################################################
     history_length = 16
@@ -229,156 +153,144 @@ def main2(coords, n , img_name , orig_img):
 
     #  ########################################################################
     mode = 0
-    x = True
-    while True:
-        fps = cvFpsCalc.get()
 
-        # Process Key (ESC: end) #################################################
-        key = cv.waitKey(10)
-        if key == 27:  # ESC
-            break
-        number, mode = select_mode(key, mode)
+    # Process Key (ESC: end) #################################################
+    key = cv.waitKey(10)
 
-        # Camera capture #####################################################
-        # ret, image = cap.read()
-        # if not ret:
-            # break
-        image = cv.imread("captured_image.png")
-        draw_on_img = cv.imread(orig_img)
-        #image = cv.flip(image, 1)  # Mirror display
-        
-
-        # Divide the input image into nxn grid
-        height, width, _ = image.shape
-        quads = []
-        draw_quads = []
-        segment_nos = []
-        for i in range(n):
-            for j in range(n):
-                quads.append(image[int(i*height/n):int((i+1)*height/n), int(j*width/n):int((j+1)*width/n)])
-                draw_quads.append(draw_on_img[int(i*height/n):int((i+1)*height/n), int(j*width/n):int((j+1)*width/n)])
-                segment_nos.append([i,j])
+    number, mode = select_mode(key, mode)
 
 
-        # test display
-        #print("displaying test image")
-        #cv.imshow('test', quads[0])
-        #cv.waitKey(0)
-        output_images = []
-        i=0
-        for quad,segment_no,draw_quad in zip(quads, segment_nos, draw_quads):
-            # print(f"Processing quadrant {i}")
-            debug_image = copy.deepcopy(quad)
-            debug_image2 = copy.deepcopy(draw_quad)
-            # cv.imshow(f"debug image {i}", debug_image)
-            i+=1
-            # Detection implementation (for each quadrant)
-            quad = cv.cvtColor(quad, cv.COLOR_BGR2RGB)
-            quad.flags.writeable = False
+    image = cv.imread("images/1.jpg")
+    draw_on_img = cv.imread(orig_img)
+    #image = cv.flip(image, 1)  # Mirror display
+    
 
-            results = hands.process(quad)
-
-            quad.flags.writeable = True
+    # Divide the input image into nxn grid
+    height, width, _ = image.shape
+    quads = []
+    draw_quads = []
+    segment_nos = []
+    for i in range(n):
+        for j in range(n):
+            quads.append(image[int(i*height/n):int((i+1)*height/n), int(j*width/n):int((j+1)*width/n)])
+            draw_quads.append(draw_on_img[int(i*height/n):int((i+1)*height/n), int(j*width/n):int((j+1)*width/n)])
+            segment_nos.append([i,j])
 
 
-            #  ####################################################################
-            if results.multi_hand_landmarks is not None:
-                for hand_landmarks, handedness in zip(results.multi_hand_landmarks,
-                                                    results.multi_handedness):
-                    # Bounding box calculation
-                    brect = calc_bounding_rect(debug_image, hand_landmarks)
-                    
-                    w1 = brect[0]
-                    h1 = brect[1]
-                    w2 = brect[2]
-                    h2 = brect[3]
-                    translated_brect = [w1 + segment_no[1]*(width//n) , h1 + segment_no[0]*(height//n), w2 + segment_no[1]*(width//n)  , h2 + segment_no[0]*(height//n)]
+    # test display
+    #print("displaying test image")
+    #cv.imshow('test', quads[0])
+    #cv.waitKey(0)
+    output_images = []
+    i=0
+    for quad,segment_no,draw_quad in zip(quads, segment_nos, draw_quads):
+        # print(f"Processing quadrant {i}")
+        debug_image = copy.deepcopy(quad)
+        debug_image2 = copy.deepcopy(draw_quad)
+        # cv.imshow(f"debug image {i}", debug_image)
+        i+=1
+        # Detection implementation (for each quadrant)
+        quad = cv.cvtColor(quad, cv.COLOR_BGR2RGB)
+        quad.flags.writeable = False
 
-                    if translated_brect not in coords:
-                        continue
+        results = hands.process(quad)
 
-                    # Landmark calculation
-                    landmark_list = calc_landmark_list(debug_image, hand_landmarks)
+        quad.flags.writeable = True
 
-                    # Conversion to relative coordinates / normalized coordinates
-                    pre_processed_landmark_list = pre_process_landmark(
-                        landmark_list)
-                    pre_processed_point_history_list = pre_process_point_history(
-                        debug_image, point_history)
-                    # Write to the dataset file
-                    logging_csv(number, mode, pre_processed_landmark_list,
-                                pre_processed_point_history_list)
 
-                    # Hand sign classification
-                    hand_sign_id = keypoint_classifier(pre_processed_landmark_list)
-                    if hand_sign_id == 2:  # Point gesture
-                        point_history.append(landmark_list[8])
-                    else:
-                        point_history.append([0, 0])
+        #  ####################################################################
+        if results.multi_hand_landmarks is not None:
+            for hand_landmarks, handedness in zip(results.multi_hand_landmarks,
+                                                results.multi_handedness):
+                # Bounding box calculation
+                brect = calc_bounding_rect(debug_image, hand_landmarks)
+                
+                w1 = brect[0]
+                h1 = brect[1]
+                w2 = brect[2]
+                h2 = brect[3]
+                translated_brect = [w1 + segment_no[1]*(width//n) , h1 + segment_no[0]*(height//n), w2 + segment_no[1]*(width//n)  , h2 + segment_no[0]*(height//n)]
 
-                    # Finger gesture classification
-                    finger_gesture_id = 0
-                    point_history_len = len(pre_processed_point_history_list)
-                    if point_history_len == (history_length * 2):
-                        finger_gesture_id = point_history_classifier(
+                if translated_brect not in coords:
+                    continue
+
+                # Landmark calculation
+                landmark_list = calc_landmark_list(debug_image, hand_landmarks)
+
+                # Conversion to relative coordinates / normalized coordinates
+                pre_processed_landmark_list = pre_process_landmark(
+                    landmark_list)
+                pre_processed_point_history_list = pre_process_point_history(
+                    debug_image, point_history)
+                # Write to the dataset file
+                logging_csv(number, mode, pre_processed_landmark_list,
                             pre_processed_point_history_list)
 
-                    # Calculates the gesture IDs in the latest detection
-                    finger_gesture_history.append(finger_gesture_id)
-                    most_common_fg_id = Counter(
-                        finger_gesture_history).most_common()
+                # Hand sign classification
+                hand_sign_id = keypoint_classifier(pre_processed_landmark_list)
+                if hand_sign_id == 2:  # Point gesture
+                    point_history.append(landmark_list[8])
+                else:
+                    point_history.append([0, 0])
 
-                    # Drawing part
-                    debug_image2 = draw_bounding_rect(use_brect, debug_image2, brect)
-                    debug_image2 = draw_landmarks(debug_image2, landmark_list)
-                    debug_image2 = draw_info_text(
-                        debug_image2,
-                        brect,
-                        handedness,
-                        keypoint_classifier_labels[hand_sign_id],
-                        point_history_classifier_labels[most_common_fg_id[0][0]],
-                    )
+                # Finger gesture classification
+                finger_gesture_id = 0
+                point_history_len = len(pre_processed_point_history_list)
+                if point_history_len == (history_length * 2):
+                    finger_gesture_id = point_history_classifier(
+                        pre_processed_point_history_list)
 
-                    # Adding Rows to Dataframe
-                    if x:
-                        handgest = keypoint_classifier_labels[hand_sign_id]
-                        if handgest == "Close":
-                            new_row = {'grid' : segment_no , 'Hand Open': 0  ,'Hand Closed': 1}
-                        
-                        elif handgest == "Open":
-                            new_row = {'grid' : segment_no , 'Hand Open': 1  ,'Hand Closed': 0}
+                # Calculates the gesture IDs in the latest detection
+                finger_gesture_history.append(finger_gesture_id)
+                most_common_fg_id = Counter(
+                    finger_gesture_history).most_common()
 
-                        else:
-                            new_row = {'grid' : segment_no , 'Hand Open': 0  ,'Hand Closed': 0}
+                # Drawing part
+                debug_image2 = draw_bounding_rect(use_brect, debug_image2, brect)
+                debug_image2 = draw_landmarks(debug_image2, landmark_list)
+                debug_image2 = draw_info_text(
+                    debug_image2,
+                    brect,
+                    handedness,
+                    keypoint_classifier_labels[hand_sign_id],
+                    point_history_classifier_labels[most_common_fg_id[0][0]],
+                )
 
-                        df = df.append(new_row,ignore_index=True)
-                     
+                # Adding Rows to Dataframe
+                
+                handgest = keypoint_classifier_labels[hand_sign_id]
+                if handgest == "Close":
+                    new_row = {'grid' : segment_no , 'Hand Open': 0  ,'Hand Closed': 1}
+                
+                elif handgest == "Open":
+                    new_row = {'grid' : segment_no , 'Hand Open': 1  ,'Hand Closed': 0}
+
+                else:
+                    new_row = {'grid' : segment_no , 'Hand Open': 0  ,'Hand Closed': 0}
+
+                df = df.append(new_row,ignore_index=True)
                     
-            else:
-                point_history.append([0, 0])
+                
+        else:
+            point_history.append([0, 0])
 
-            debug_image2 = draw_point_history(debug_image2, point_history)
-            # debug_image = draw_info(debug_image, fps, mode, number)
-            #cv.imshow(f"Processed quad {i}", debug_image)
-            output_images.append(debug_image2)
-        
-        
-        # Stitch the images back together
-        output = np.zeros((height, width, 3), dtype=np.uint8)
+        debug_image2 = draw_point_history(debug_image2, point_history)
+        # debug_image = draw_info(debug_image, fps, mode, number)
+        #cv.imshow(f"Processed quad {i}", debug_image)
+        output_images.append(debug_image2)
+    
+    
+    # Stitch the images back together
+    output = np.zeros((height, width, 3), dtype=np.uint8)
 
-        for i in range(n):
-            for j in range(n):
-                output[int(i*height/n):int((i+1)*height/n), int(j*width/n):int((j+1)*width/n)] = output_images[i*n+j]
-        
-        #cv.imshow('Hand Gesture Recognition', output)
-        cv.imwrite(img_name, output)
+    for i in range(n):
+        for j in range(n):
+            output[int(i*height/n):int((i+1)*height/n), int(j*width/n):int((j+1)*width/n)] = output_images[i*n+j]
+    
+    #cv.imshow('Hand Gesture Recognition', output)
+    cv.imwrite(img_name, output)
 
-
-        x = False
-        return
-
-    cap.release()
-    cv.destroyAllWindows()
+    return
 
 
 
@@ -790,40 +702,62 @@ def find_overlapping_coords(rect_coords1 ,rect_coords2):
     result = [x for x in rect_coords2 if x not in remove_coords]
     return result
 
-n = [1,2,3,4,5,6,7,8]
-#Getting all the coords ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-hand_coords = []
-for x in n:
-    hand_coords.append(main1(x))
+n = [1,2,4,6,8,10]
 
-#getting valid coords for each griddd +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+def detect_hands(n):
+    global hands
 
-for i in range(1,len(hand_coords)):
-    for j in range(i):
-        hand_coords[i] = find_overlapping_coords(hand_coords[j], hand_coords[i])
+    args = get_args()
+    
+    use_static_image_mode = args.use_static_image_mode
+    min_detection_confidence = args.min_detection_confidence
+    min_tracking_confidence = args.min_tracking_confidence
+
+    
+    # Model load #############################################################
+    mp_hands = mp.solutions.hands
+    hands = mp_hands.Hands(
+        static_image_mode=use_static_image_mode,
+        max_num_hands=15,
+        min_detection_confidence=min_detection_confidence,
+        min_tracking_confidence=min_tracking_confidence,
+    )
+
+    #Getting all the coords ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    hand_coords = []
+    for x in n:
+        hand_coords.append(main1(x))
+
+    #getting valid coords for each griddd +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    for i in range(1,len(hand_coords)):
+        for j in range(i):
+            hand_coords[i] = find_overlapping_coords(hand_coords[j], hand_coords[i])
 
 
 
-#getting the correct hands at each level++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    #getting the correct hands at each level++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
-for i in range(len(hand_coords)):
-    if i==0 and i!= len(hand_coords)-1:
-        main2(hand_coords[i], n[i] , f"processed{i}.jpg", "captured_image.png")
-    elif i != len(hand_coords)-1:
-        main2(hand_coords[i], n[i] , f"processed{i}.jpg", f"processed{i-1}.jpg")
+    for i in range(len(hand_coords)):
+        if i==0 and i!= len(hand_coords)-1:
+            main2(hand_coords[i], n[i] , f"processed{i}.jpg", "images/1.jpg")
+        elif i != len(hand_coords)-1:
+            main2(hand_coords[i], n[i] , f"processed{i}.jpg", f"processed{i-1}.jpg")
 
-    else:
-        main2(hand_coords[i], n[i] , "processed_image.jpg", f"processed{i-1}.jpg")
-
-
+        else:
+            main2(hand_coords[i], n[i] , "processed_image.jpg", f"processed{i-1}.jpg")
 
 
-# Overlapping +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
-print(df)
-df.to_csv('output.csv', index=False) 
+    # Overlapping +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+    print(df)
+    df.to_csv('output.csv', index=False) 
+
+detect_hands(n)
 
 cv.waitKey(0)
 cv.destroyAllWindows()
