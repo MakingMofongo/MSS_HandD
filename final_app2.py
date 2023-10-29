@@ -757,7 +757,6 @@ def detect_hands(n):
     print(df)
     df.to_csv('output.csv', index=False) 
 
-detect_hands(n)
 
 cv.waitKey(0)
 cv.destroyAllWindows()

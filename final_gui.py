@@ -6,6 +6,9 @@ from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QLa
 from PyQt5.QtCore import QTimer
 from PyQt5.QtGui import QImage, QPixmap
 import subprocess
+
+from final_app2 import detect_hands
+from graph import draw_graph
 import pandas as pd
 import random
 
@@ -139,8 +142,8 @@ class WebcamCaptureApp(QWidget):
             ret, frame = self.video_capture.read()
             if ret:
                 cv2.imwrite("captured_image.png", frame)
-                subprocess.call(['python', 'final_app2.py'])
-                subprocess.call(['python', 'graph.py'])
+                detect_hands([1,4,6])
+                draw_graph()
 
                 df = pd.read_csv("output.csv")
 
