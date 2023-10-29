@@ -67,7 +67,7 @@ def main1(n):
     history_length = 16
     point_history = deque(maxlen=history_length)
     
-    image = cv.imread("images/1.jpg")
+    image = cv.imread("captured_image.png")
     #image = cv.flip(image, 1)  # Mirror display
     
 
@@ -160,7 +160,7 @@ def main2(coords, n , img_name , orig_img):
     number, mode = select_mode(key, mode)
 
 
-    image = cv.imread("images/1.jpg")
+    image = cv.imread("captured_image.png")
     draw_on_img = cv.imread(orig_img)
     #image = cv.flip(image, 1)  # Mirror display
     
@@ -741,7 +741,7 @@ def detect_hands(n):
 
     for i in range(len(hand_coords)):
         if i==0 and i!= len(hand_coords)-1:
-            main2(hand_coords[i], n[i] , f"processed{i}.jpg", "images/1.jpg")
+            main2(hand_coords[i], n[i] , f"processed{i}.jpg", "captured_image.png")
         elif i != len(hand_coords)-1:
             main2(hand_coords[i], n[i] , f"processed{i}.jpg", f"processed{i-1}.jpg")
 
