@@ -792,9 +792,15 @@ def find_overlapping_coords(rect_coords1 ,rect_coords2):
 
 n = [1,2,3,4,5,6,7,8]
 #Getting all the coords ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+<<<<<<< HEAD
 hand_coords = []
 for x in n:
     hand_coords.append(main1(x))
+=======
+hand_coords4 = main1(1)
+hand_coords6 = main1(4)
+hand_coords8 = main1(6)
+>>>>>>> 525f3268cfd4f4f6de08fdb33c60443930dc59b8
 
 #getting valid coords for each griddd +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -805,6 +811,7 @@ for i in range(1,len(hand_coords)):
 
 
 #getting the correct hands at each level++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+<<<<<<< HEAD
 
 
 for i in range(len(hand_coords)):
@@ -817,6 +824,11 @@ for i in range(len(hand_coords)):
         main2(hand_coords[i], n[i] , "processed_image.jpg", f"processed{i-1}.jpg")
 
 
+=======
+main2(hand_coords4, 1 , "processed4.jpg", "captured_image.png")
+main2(hand_coords6, 4 , "processed6.jpg", "processed4.jpg")
+main2(hand_coords8, 6 , "processed_image.jpg", "processed6.jpg")
+>>>>>>> 525f3268cfd4f4f6de08fdb33c60443930dc59b8
 
 
 # Overlapping +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
