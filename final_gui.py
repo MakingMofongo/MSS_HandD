@@ -80,16 +80,15 @@ class WebcamCaptureApp(QWidget):
         global hands_close
         global filename
         # Get input values and hide the input boxes
-        hands_open = self.handsopen_input.text()
-        hands_close = self.handsclose_input.text()
+        hands_open = 'hands open'
+        hands_close = 'hands close'
+        a=self.handsopen_input.text()
+        b=self.handsclose_input.text()
+        if a!='':
+            hands_open=a
+        if b!='':
+            hands_close=b
         filename = self.filename_input.text()
-
-
-        self.handsopen_input.hide()
-        self.handsclose_input.hide()
-        self.filename_input.hide()
-        self.input_button.hide()
-        self.input_submitted = True
 
     def start_webcam(self):
         if not self.is_capturing:
@@ -120,7 +119,7 @@ class WebcamCaptureApp(QWidget):
                     n=[1,4,6]
                     # Draw a nxn grid for all values of n
                     for i in n:
-                        # random.seed(i*20)
+                        random.seed(i*20)
                         color = random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)
                         for j in range(0, width, int(width/i)):
                             cv2.line(frame, (j, 0), (j, height), color, 2, 1)
@@ -149,8 +148,8 @@ class WebcamCaptureApp(QWidget):
                 df.to_csv(filename, index=False)
 
                 self.show_combined_images("processed_image.jpg", "bar_graph.png")  # Display side by side
-                self.stop_webcam()
-                self.screenshot_taken = True
+                # self.stop_webcam()
+                # self.screenshot_taken = True
 
     def stop_webcam(self):
         if self.is_capturing:
