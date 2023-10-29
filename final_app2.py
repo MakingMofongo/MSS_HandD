@@ -19,7 +19,6 @@ import pandas as pd
 import sys
 
 # Dataframe preparation +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-df = pd.DataFrame(columns = [ 'grid' , 'Hand Open' , 'Hand Closed'])
 
 def get_args():
     parser = argparse.ArgumentParser()
@@ -706,6 +705,9 @@ n = [1,2,4,6,8,10]
 
 def detect_hands(n):
     global hands
+    global df
+    df = pd.DataFrame(columns = [ 'grid' , 'Hand Open' , 'Hand Closed'])
+
 
     args = get_args()
     

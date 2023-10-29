@@ -119,9 +119,9 @@ class WebcamCaptureApp(QWidget):
                 height, width, channel = frame.shape
                 self.grid=True
                 if self.grid==True:
-                    n=[1,4,6]
+                    self.n=[1,2]
                     # Draw a nxn grid for all values of n
-                    for i in n:
+                    for i in self.n:
                         random.seed(i*20)
                         color = random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)
                         for j in range(0, width, int(width/i)):
@@ -141,7 +141,7 @@ class WebcamCaptureApp(QWidget):
             ret, frame = self.video_capture.read()
             if ret:
                 cv2.imwrite("captured_image.png", frame)
-                detect_hands([1,4,6])
+                detect_hands(self.n)
                 draw_graph()
 
                 df = pd.read_csv("output.csv")
