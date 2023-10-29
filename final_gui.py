@@ -7,6 +7,7 @@ from PyQt5.QtCore import QTimer
 from PyQt5.QtGui import QImage, QPixmap
 import subprocess
 import pandas as pd
+import random
 
 hands_open = "hands open"
 hands_close = "hands close"
@@ -114,6 +115,20 @@ class WebcamCaptureApp(QWidget):
             if ret:
                 frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                 height, width, channel = frame.shape
+                self.grid=True
+                if self.grid==True:
+                    n=[1,4,6]
+                    # Draw a nxn grid for all values of n
+                    for i in n:
+                        # random.seed(i*20)
+                        color = random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)
+                        for j in range(0, width, int(width/i)):
+                            cv2.line(frame, (j, 0), (j, height), color, 2, 1)
+                        for j in range(0, height, int(height/i)):
+                            cv2.line(frame, (0, j), (width, j), color, 2, 1)
+                            
+
+
                 bytes_per_line = 3 * width
                 q_image = QImage(frame.data, width, height, bytes_per_line, QImage.Format_RGB888)
                 pixmap = QPixmap.fromImage(q_image)
