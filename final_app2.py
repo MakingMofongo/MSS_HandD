@@ -259,13 +259,13 @@ def main2(coords, n , img_name , orig_img):
                 
                 handgest = keypoint_classifier_labels[hand_sign_id]
                 if handgest == "Close":
-                    new_row = {'grid' : segment_no , 'Hand Open': 0  ,'Hand Closed': 1}
+                    new_row = {'grid' : segment_no ,'nxn' : f"{n}x{n}" , 'Hand Open': 0  ,'Hand Closed': 1}
                 
                 elif handgest == "Open":
-                    new_row = {'grid' : segment_no , 'Hand Open': 1  ,'Hand Closed': 0}
+                    new_row = {'grid' : segment_no,'nxn' : f"{n}x{n}" , 'Hand Open': 1  ,'Hand Closed': 0}
 
                 else:
-                    new_row = {'grid' : segment_no , 'Hand Open': 0  ,'Hand Closed': 0}
+                    new_row = {'grid' : segment_no ,'nxn' : f"{n}x{n}", 'Hand Open': 0  ,'Hand Closed': 0}
 
                 df = df.append(new_row,ignore_index=True)
                     
@@ -723,7 +723,7 @@ def load_model():
 def detect_hands(n):
     global hands
     global df
-    df = pd.DataFrame(columns = [ 'grid' , 'Hand Open' , 'Hand Closed'])
+    df = pd.DataFrame(columns = [ 'grid', 'nxn' , 'Hand Open' , 'Hand Closed'])
 
 
     #Getting all the coords ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
