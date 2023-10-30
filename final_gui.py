@@ -137,12 +137,16 @@ class WebcamCaptureApp(QWidget):
                 self.image_label.setPixmap(pixmap)
 
     def capture_image(self):
+        global hands_open
+        global hands_close
+
         if self.is_capturing and not self.screenshot_taken:
             ret, frame = self.video_capture.read()
             if ret:
                 cv2.imwrite("captured_image.png", frame)
                 detect_hands(self.n)
-                draw_graph()
+
+                draw_graph(hands_open, hands_close)
 
                 df = pd.read_csv("output.csv")
 

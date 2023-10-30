@@ -1,7 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
-def draw_graph():
+def draw_graph(cat1 = 'Hands Open', cat2 ='Hands closed'):
     df = pd.read_csv("output.csv")
 
     total_hands_open = df['Hand Open'].sum()
@@ -11,7 +11,7 @@ def draw_graph():
     # print(total_hands_close)
     # print(total_hands_open)
 
-    categories = ['Hands Open', 'Hands closed']
+    categories = [cat1 , cat2 ]
     counts = [total_hands_open, total_hands_close]
 
 
