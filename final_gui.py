@@ -7,7 +7,7 @@ from PyQt5.QtCore import QTimer
 from PyQt5.QtGui import QImage, QPixmap
 import subprocess
 
-from final_app2 import detect_hands
+from final_app2 import detect_hands, load_model
 from graph import draw_graph
 import pandas as pd
 import random
@@ -212,6 +212,7 @@ class WebcamCaptureApp(QWidget):
 
 
 if __name__ == '__main__':
+    load_model()
     app = QApplication(sys.argv)
     window = WebcamCaptureApp()
     window.show()

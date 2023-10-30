@@ -701,14 +701,9 @@ def find_overlapping_coords(rect_coords1 ,rect_coords2):
     result = [x for x in rect_coords2 if x not in remove_coords]
     return result
 
-n = [1,2,4,6,8,10]
 
-def detect_hands(n):
+def load_model():
     global hands
-    global df
-    df = pd.DataFrame(columns = [ 'grid' , 'Hand Open' , 'Hand Closed'])
-
-
     args = get_args()
     
     use_static_image_mode = args.use_static_image_mode
@@ -724,6 +719,12 @@ def detect_hands(n):
         min_detection_confidence=min_detection_confidence,
         min_tracking_confidence=min_tracking_confidence,
     )
+
+def detect_hands(n):
+    global hands
+    global df
+    df = pd.DataFrame(columns = [ 'grid' , 'Hand Open' , 'Hand Closed'])
+
 
     #Getting all the coords ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     hand_coords = []
