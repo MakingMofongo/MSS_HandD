@@ -38,6 +38,10 @@ class WebcamCaptureApp(QWidget):
         self.filename_input.setPlaceholderText("File name")
         self.layout.addWidget(self.filename_input)
 
+        self.grid_input = QLineEdit(self)
+        self.grid_input.setPlaceholderText("grids")
+        self.layout.addWidget(self.grid_input)
+
         # Add a button to trigger the disappearance of input boxes
         self.input_button = QPushButton("Submit Input")
         self.input_button.clicked.connect(self.hide_input)
@@ -74,6 +78,8 @@ class WebcamCaptureApp(QWidget):
 
         self.setLayout(self.layout)
 
+        self.start_button.setEnabled(False)
+
         # Initialize a variable to track whether the input has been submitted
         self.input_submitted = False
 
@@ -92,6 +98,12 @@ class WebcamCaptureApp(QWidget):
         if b!='':
             hands_close=b
         filename = self.filename_input.text()
+        numbers_str = self.grid_input.text()
+        number_strings = numbers_str.split(',')
+        self.n = [int(num) for num in number_strings]
+        self.start_button.setEnabled(True)
+
+
 
     def start_webcam(self):
         if not self.is_capturing:
@@ -119,7 +131,6 @@ class WebcamCaptureApp(QWidget):
                 height, width, channel = frame.shape
                 self.grid=True
                 if self.grid==True:
-                    self.n=[1,2]
                     # Draw a nxn grid for all values of n
                     for i in self.n:
                         random.seed(i*20)

@@ -723,6 +723,7 @@ def load_model():
 def detect_hands(n):
     global hands
     global df
+    print(n)
     df = pd.DataFrame(columns = [ 'grid', 'nxn' , 'Hand Open' , 'Hand Closed'])
 
 
