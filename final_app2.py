@@ -67,7 +67,7 @@ def main1(n):
     point_history = deque(maxlen=history_length)
     
     image = cv.imread("captured_image.png")
-    #image = cv.flip(image, 1)  # Mirror display
+    image = cv.flip(image, 1)  # Mirror display
     
 
     # Divide the input image into nxn grid
@@ -161,7 +161,7 @@ def main2(coords, n , img_name , orig_img):
 
     image = cv.imread("captured_image.png")
     draw_on_img = cv.imread(orig_img)
-    #image = cv.flip(image, 1)  # Mirror display
+    image = cv.flip(image, 1)  # Mirror display
     
 
     # Divide the input image into nxn grid

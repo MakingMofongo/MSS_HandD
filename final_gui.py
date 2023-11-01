@@ -126,6 +126,7 @@ class WebcamCaptureApp(QWidget):
     def update_frame(self):
         if self.is_capturing:
             ret, frame = self.video_capture.read()
+            frame = cv2.flip(frame,1)
             if ret:
                 frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                 height, width, channel = frame.shape
@@ -153,6 +154,7 @@ class WebcamCaptureApp(QWidget):
 
         if self.is_capturing and not self.screenshot_taken:
             ret, frame = self.video_capture.read()
+            frame = cv2.flip(frame,1)
             if ret:
                 cv2.imwrite("captured_image.png", frame)
                 detect_hands(self.n)
